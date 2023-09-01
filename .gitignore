@@ -73,5 +73,10 @@ Plugins/*/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
+#important to manually copy over 
 #Starter Content
 Content/StarterContent/*
+
+#Very High Res Stuff from Quixel Bridge, need to backup manually every now and then for whatever is used.
+Content/Megascans/*
+Content/MSPresets/* 
