@@ -77,6 +77,11 @@ DerivedDataCache/*
 #Starter Content
 Content/StarterContent/*
 
-#Very High Res Stuff from Quixel Bridge, need to backup manually every now and then for whatever is used.
+#Very High Res Stuff from Quixel Bridge and Black Alder need to backup manually every now and then for whatever is used. As well as the open world
 Content/Megascans/*
 Content/MSPresets/* 
+Content/BlackAlder/*
+Content/__ExternalActors__/Maps/SlashOpenWorld/*
+Content/__ExternalActors__/Maps/SlashOpenWorldWithFoliage/*
+Content/__ExternalObjects__/Maps/SlashOpenWorld/*
+Content/__ExternalObjects__/Maps/SlashOpenWorldWithFoliage/*
