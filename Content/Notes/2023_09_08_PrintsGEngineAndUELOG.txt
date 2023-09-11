@@ -1,0 +1,32 @@
+AItem::AItem()
+{
+	PrimaryActorTick.bCanEverTick = true;
+
+}
+
+void AItem::BeginPlay()
+{
+	UE_LOG(LogTemp, Warning, TEXT("This happens before BP "))
+	Super::BeginPlay(); //This calls BP BeginPlay. How is BP_Item a super class of Item?
+	UE_LOG(LogTemp, Warning, TEXT("Begin Play called! This happens after BP, but I don't get why, isn't BP the sub, not the super"));
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Blue, FString("Item On screen message"));
+	}
+
+}
+
+void AItem::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	UE_LOG(LogTemp, Warning, TEXT("DeltaTime: %f"), DeltaTime)
+	if (GEngine) {
+		FString Name = GetName();
+		FString Message = FString::Printf(TEXT("DeltaTime: %f Item Name %s." ),
+			DeltaTime, *Name);
+		//0 counts as a unique key, -1 means don't use any key
+		GEngine->AddOnScreenDebugMessage(0, 60.f, FColor::Blue, Message);
+		UE_LOG(LogTemp, Warning, TEXT("ItemName: %s"), *Name);
+	}
+}
+
+
