@@ -8,7 +8,7 @@
 
 #define THIRTY 30
 
-AItem::AItem() : Amplitude(5.0f), TimeConstant(2.f)
+AItem::AItem()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -35,7 +35,7 @@ void AItem::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("Incrementer %i"), Incrementer);
 	FVector Forward = GetActorForwardVector();
 
-	RunningTime = 0.f;
+
 
 
 
@@ -45,13 +45,13 @@ void AItem::BeginPlay()
 void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	float MovementRate = 50.f;	
 	float RotationRate = 60.f; 
 
-	RunningTime += DeltaTime;
-	float DeltaZ = Amplitude * FMath::Sin(RunningTime * TimeConstant);
-	AddActorWorldOffset(FVector(0, 0, DeltaZ));	
-	AddActorWorldRotation(FRotator(0, RotationRate * DeltaTime, 0));
+	AddActorWorldOffset(FVector(MovementRate* DeltaTime, 0, 0));
 	DRAW_SPHERE_SingleFrame(GetActorLocation());
+
+	AddActorWorldRotation(FRotator(0, RotationRate * DeltaTime, 0));
 	DRAW_VECTOR_SingleFrame(GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 100.f));
 }
 

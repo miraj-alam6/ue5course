@@ -17,7 +17,13 @@ public:
 	AItem();
 	virtual void Tick(float DeltaTime) override;
 
+
+
 protected:
 	virtual void BeginPlay() override;
 
+private:
+	float RunningTime;
+	float Amplitude; 	
+	float TimeConstant;
 };
