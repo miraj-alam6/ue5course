@@ -11,49 +11,35 @@
 AItem::AItem() : Amplitude(5.0f), TimeConstant(2.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMeshComponent"));
+	RootComponent = ItemMesh;
 }
 
 void AItem::BeginPlay()
 {
-	UE_LOG(LogTemp, Warning, TEXT("This happens before BP "))
+
 	Super::BeginPlay(); //This calls BP BeginPlay. How is BP_Item a super class of Item?
-	UE_LOG(LogTemp, Warning, TEXT("Begin Play called! This happens after BP, but I don't get why, isn't BP the sub, not the super"));
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Blue, FString("Item On screen message"));
-	}
-	//Note: this does not get reset between different PIE sessions which is why I do a modulo
-	static int Incrementer = 0;
-	Incrementer++;
-	Incrementer = Incrementer % 4 + 2;
-	SetActorLocation(FVector(50.f * Incrementer, 100.f * Incrementer, 50.f * Incrementer));
-	SetActorRotation(FRotator(0.f, 45.f * Incrementer, 0.f));
 
 	UWorld* World = GetWorld();
 	FVector Location = GetActorLocation();
-
-	UE_LOG(LogTemp, Warning, TEXT("Incrementer %i"), Incrementer);
 	FVector Forward = GetActorForwardVector();
+
+
+	int32 intTest = Average<int32>(2, 5);
+	float floatTest = Average<float>(2, 5);
+	FVector vectorTest = Average<FVector>(FVector(2, 4, 9), FVector(5, 6, 7));
 
 	RunningTime = 0.f;
 
-
-
+	UE_LOG(LogTemp, Warning, TEXT("Averages %i   %f   %s"), intTest, floatTest, *(vectorTest.ToString()));
 
 }
 
 void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	float RotationRate = 60.f; 
 
-	RunningTime += DeltaTime;
-	//float DeltaZ = Amplitude * FMath::Sin(RunningTime * TimeConstant);
-	float DeltaZ = TransformedSine(RunningTime);
-	//AddActorWorldOffset(FVector(0, 0, DeltaZ));	
-	AddActorWorldRotation(FRotator(0, RotationRate * DeltaTime, 0));
-	DRAW_SPHERE_SingleFrame(GetActorLocation());
-	DRAW_VECTOR_SingleFrame(GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 100.f));
+	RunningTime += DeltaTime;	
 }
 
 float AItem::TransformedSine(float InputValue) {

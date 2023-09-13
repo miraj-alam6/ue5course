@@ -34,6 +34,8 @@ protected:
 	float TransformedSine(float InputValue);
 	UFUNCTION(BlueprintPure)
 	float TransformedCosine(float InputValue);
+	template<typename T>
+	T Average (T First, T Second);
 private:
 	//Note how you can just make specifiers with just the defaults and not make it useable in event graph if that's what you wish
 	//UPROPERTY(VisibleDefaultsOnly)
@@ -47,6 +49,12 @@ private:
 	//UPROPERTY(EditInstanceOnly)
 
 };
+
+template<typename T>
+inline T AItem::Average(T First, T Second)
+{
+	return (First + Second) / 2;
+}
 
 
 
@@ -72,12 +80,7 @@ AItem::AItem() : Amplitude(5.0f), TimeConstant(2.f)
 
 void AItem::BeginPlay()
 {
-	UE_LOG(LogTemp, Warning, TEXT("This happens before BP "))
-	Super::BeginPlay(); //This calls BP BeginPlay. How is BP_Item a super class of Item?
-	UE_LOG(LogTemp, Warning, TEXT("Begin Play called! This happens after BP, but I don't get why, isn't BP the sub, not the super"));
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Blue, FString("Item On screen message"));
-	}
+	Super::BeginPlay(); 
 	//Note: this does not get reset between different PIE sessions which is why I do a modulo
 	static int Incrementer = 0;
 	Incrementer++;
@@ -93,9 +96,11 @@ void AItem::BeginPlay()
 
 	RunningTime = 0.f;
 
-
-
-
+	//Test for our Template function
+	int32 intTest = Average<int32>(2, 5);
+	float floatTest = Average<float>(2, 5);
+	FVector vectorTest = Average<FVector>(FVector(2, 4, 9), FVector(5, 6, 7));
+	UE_LOG(LogTemp, Warning, TEXT("Averages %i   %f   %s"), intTest, floatTest, *(vectorTest.ToString()));
 }
 
 void AItem::Tick(float DeltaTime)
@@ -110,6 +115,10 @@ void AItem::Tick(float DeltaTime)
 	AddActorWorldRotation(FRotator(0, RotationRate * DeltaTime, 0));
 	DRAW_SPHERE_SingleFrame(GetActorLocation());
 	DRAW_VECTOR_SingleFrame(GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 100.f));
+
+	//Another test for our Template function
+	//Draws a point at midpoint between actor and origin
+	DRAW_POINT_SingleFrame(Average<FVector>(GetActorLocation(), FVector::ZeroVector));
 }
 
 float AItem::TransformedSine(float InputValue) {
