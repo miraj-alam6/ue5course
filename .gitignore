@@ -77,7 +77,7 @@ DerivedDataCache/*
 #Starter Content
 Content/StarterContent/*
 
-#Very High Res Stuff from Quixel Bridge and Black Alder need to backup manually every now and then for whatever is used. As well as the open world
+#Assets that are too from Quixel Bridge and Black Alder that I did not want to commit so I will need to backup manually every now and then for whatever is used. As well as the open world
 Content/Megascans/*
 Content/MSPresets/* 
 Content/BlackAlder/*
@@ -86,3 +86,6 @@ Content/__ExternalActors__/Maps/SlashOpenWorldWithFoliage/*
 Content/__ExternalObjects__/Maps/SlashOpenWorld/*
 Content/__ExternalObjects__/Maps/SlashOpenWorldWithFoliage/*
 Content/MedievalDungeon/*
+Content/AnimalVarietyPack*
+
+
