@@ -38,14 +38,19 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess();
 	void MoveForwardCB(float Value);
+	void TurnCB(float Value);
+	void LookUpCB(float Value);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputMappingContext* BirdMappingContext;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* MoveAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction* LookAction;
 
 
 	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
 private:
 	UPROPERTY(VisibleAnywhere)
 	//class UCapsuleComponent* Capsule; //This a valid way to forward declare, but commented out becauase I want to do the list at beginning strategy.
