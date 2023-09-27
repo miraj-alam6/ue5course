@@ -4,6 +4,8 @@
 #include "Pawns/Bird.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 #include "InputAction.h"
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
@@ -26,6 +28,15 @@ ABird::ABird()
 	BirdMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BirdMesh"));
 	//Capsule RootComponent and GetRootComponent() all do the same thing atm, I just use GetRootComponent()
 	BirdMesh->SetupAttachment(GetRootComponent());
+
+
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->SetupAttachment(GetRootComponent());
+	CameraBoom->TargetArmLength = 300.f;
+
+	ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
+	ViewCamera->SetupAttachment(CameraBoom);
+	
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
@@ -105,9 +116,9 @@ void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABird::Move);
+		//EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABird::Move);
 	}
 
-	//PlayerInputComponent->BindAxis(FName("MoveForward"), this, &ABird::MoveForwardCB);
+	PlayerInputComponent->BindAxis(FName("MoveForward"), this, &ABird::MoveForwardCB);
 }
 

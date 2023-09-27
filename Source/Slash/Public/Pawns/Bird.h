@@ -14,8 +14,11 @@
 //Forward declarations
 class UCapsuleComponent;
 class USkeletalMeshComponent;
+class USpringArmComponent;
+class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+
 //only can do this forward declaration because the header has a reference to a struct rather than passing it by value
 struct FInputActionValue;
 
@@ -41,6 +44,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* MoveAction;
 
+
 	void Move(const FInputActionValue& Value);
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -48,4 +52,9 @@ private:
 	UCapsuleComponent* Capsule;
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* BirdMesh;
+	UPROPERTY(VisibleAnywhere)
+	USpringArmComponent* CameraBoom;
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* ViewCamera;
+
 };
