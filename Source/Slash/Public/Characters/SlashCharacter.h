@@ -7,6 +7,11 @@
 #include "SlashCharacter.generated.h"
 class USpringArmComponent;
 class UCameraComponent;
+class UInputMappingContext;
+class UInputAction;
+
+//only can do this forward declaration because the header has a reference to a struct rather than passing it by value
+struct FInputActionValue;
 
 UCLASS()
 class SLASH_API ASlashCharacter : public ACharacter
@@ -21,10 +26,22 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputMappingContext* SlashContext;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* MovementAction;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* LookAction;
+
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+
 	void MoveForwardCB(float Value);
 	void MoveRightCB(float Value);
 	void TurnCB(float Value);
 	void LookUpCB(float Value);
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* CameraBoom;
