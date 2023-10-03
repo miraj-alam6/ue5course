@@ -7,8 +7,11 @@
 #include "SlashCharacter.generated.h"
 class USpringArmComponent;
 class UCameraComponent;
+class UGroomComponent;
+
 class UInputMappingContext;
 class UInputAction;
+
 
 //only can do this forward declaration because the header has a reference to a struct rather than passing it by value
 struct FInputActionValue;
@@ -47,4 +50,10 @@ private:
 	USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* ViewCamera;
+
+	UPROPERTY(VisibleAnywhere, Category = Hair)
+	UGroomComponent* Hair;
+
+	UPROPERTY(VisibleAnywhere, Category = Hair)
+	UGroomComponent* Eyebrows;
 };

@@ -1,3 +1,65 @@
+//Note this file has code for pawn moving in both ways, but it's important to comment out one of the lines that adds the callbacks so that it doesn't double up on the input.
+
+THE H FILE:
+// Fill out your copyright notice in the Description page of Project Settings.
+
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Character.h"
+#include "SlashCharacter.generated.h"
+class USpringArmComponent;
+class UCameraComponent;
+class UInputMappingContext;
+class UInputAction;
+
+//only can do this forward declaration because the header has a reference to a struct rather than passing it by value
+struct FInputActionValue;
+
+UCLASS()
+class SLASH_API ASlashCharacter : public ACharacter
+{
+	GENERATED_BODY()
+
+public:
+	ASlashCharacter();
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+
+protected:
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputMappingContext* SlashContext;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* MovementAction;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* LookAction;
+
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+
+	void MoveForwardCB(float Value);
+	void MoveRightCB(float Value);
+	void TurnCB(float Value);
+	void LookUpCB(float Value);
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	USpringArmComponent* CameraBoom;
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* ViewCamera;
+};
+
+
+THE CPP FILE:
+
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
@@ -5,8 +67,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GroomComponent.h"
-
 #include "InputAction.h"
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
@@ -37,14 +97,6 @@ ASlashCharacter::ASlashCharacter()
 
 	ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
 	ViewCamera->SetupAttachment(CameraBoom);
-
-	Hair = CreateDefaultSubobject<UGroomComponent>(TEXT("Hair"));
-	Hair->SetupAttachment(GetMesh());
-	Hair->AttachmentName = FString("head");
-
-	Eyebrows = CreateDefaultSubobject<UGroomComponent>(TEXT("Eyebrows"));
-	Eyebrows->SetupAttachment(GetMesh());
-	Eyebrows->AttachmentName = FString("head");
 
 }
 
@@ -160,3 +212,4 @@ void ASlashCharacter::LookUpCB(float Value)
 {
 	AddControllerPitchInput(Value);
 }
+
