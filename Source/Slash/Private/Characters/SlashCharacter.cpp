@@ -78,6 +78,16 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Look);
+		//This is just a reminder that Released Does work even for things that are axes in value type. It seems it completes once it reaches zero aka you're not pressing any of the inputs for the mapping.
+		//EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Completed, this, &ACharacter::Jump);
+
+		// For Jump bind to the built in jump function for Character Movement, we don't have to make our own function
+		//I also bind to released in order to utilize Jump Max Hold Time in Character, other the jump will behave like you're holding the full time even if you tap the button quickly
+		//IMPORTANT: I DID NOT USE TRIGGERED AND INSTEAD USED STARTED in order to prevent bunny hopping from holding the jump button
+		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+
 	}
 
 	//Fully functional non enhanced input
@@ -85,6 +95,12 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	//PlayerInputComponent->BindAxis(FName("Turn"), this, &ASlashCharacter::TurnCB);
 	//PlayerInputComponent->BindAxis(FName("LookUp"), this, &ASlashCharacter::LookUpCB);
 	//PlayerInputComponent->BindAxis(FName("MoveRight"), this, &ASlashCharacter::MoveRightCB);
+
+	//Jump with non enhanced input, bind to the built in jump function. we don't have to make our own function
+	//I also bind to released in order to utilize Jump Max Hold Time in Character
+	//without calling StopJumping, the jump will behave as if you're holding the whole time
+	//PlayerInputComponent->BindAction(FName("Jump"), EInputEvent::IE_Pressed, this, &ACharacter::Jump);
+	//PlayerInputComponent->BindAction(FName("Jump"), EInputEvent::IE_Released, this, &ACharacter::StopJumping);
 }
 
 void ASlashCharacter::Move(const FInputActionValue& Value)

@@ -1,0 +1,67 @@
+//Note this file has code for pawn moving in both ways, but it's important to comment out one of the lines that adds the callbacks so that it doesn't double up on the input.
+
+THE H FILE:
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Animation/AnimInstance.h"
+#include "SlashAnimInstance.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class SLASH_API USlashAnimInstance : public UAnimInstance
+{
+	GENERATED_BODY()	
+public:
+	virtual void NativeInitializeAnimation() override;
+	virtual void NativeUpdateAnimation(float DeltaTime) override;
+
+	UPROPERTY(BlueprintReadOnly)
+	class ASlashCharacter* SlashCharacter;
+
+	UPROPERTY(BlueprintReadOnly,  Category = Movement)
+	class UCharacterMovementComponent* SlashCharacterMovement;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	float GroundSpeed;
+};
+
+
+
+
+THE CPP FILE:
+
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Characters/SlashAnimInstance.h"
+
+#include "Characters/SlashCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+
+void USlashAnimInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+	//SlashCharacter as well many other variables in this function are member
+	//variable pointers that are nullptr by default and we set them by just getting stuff
+	//from the pawn owner
+	SlashCharacter = Cast<ASlashCharacter>(TryGetPawnOwner());
+	if (SlashCharacter) {
+		SlashCharacterMovement = SlashCharacter->GetCharacterMovement();
+	}
+}
+
+void USlashAnimInstance::NativeUpdateAnimation(float DeltaTime)
+{
+	Super::NativeUpdateAnimation(DeltaTime);
+
+	if (SlashCharacterMovement) {
+		GroundSpeed = UKismetMathLibrary::VSizeXY(SlashCharacterMovement->Velocity);		
+	}
+}
+
