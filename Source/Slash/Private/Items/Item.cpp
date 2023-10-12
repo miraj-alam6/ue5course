@@ -4,15 +4,19 @@
 #include "Items/Item.h"
 #include "Slash/DebugMacros.h"
 #include "Kismet/KismetMathLibrary.h"
-
+#include "Components/SphereComponent.h"
 
 #define THIRTY 30
 
-AItem::AItem() : Amplitude(5.0f), TimeConstant(2.f)
+AItem::AItem() : Amplitude(1.0f), TimeConstant(1.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMeshComponent"));
 	RootComponent = ItemMesh;
+
+
+	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
+	Sphere->SetupAttachment(GetRootComponent());
 }
 
 void AItem::BeginPlay()
@@ -24,15 +28,10 @@ void AItem::BeginPlay()
 	FVector Location = GetActorLocation();
 	FVector Forward = GetActorForwardVector();
 
-
-	int32 intTest = Average<int32>(2, 5);
-	float floatTest = Average<float>(2, 5);
-	FVector vectorTest = Average<FVector>(FVector(2, 4, 9), FVector(5, 6, 7));
-
 	RunningTime = 0.f;
 
-	UE_LOG(LogTemp, Warning, TEXT("Averages %i   %f   %s"), intTest, floatTest, *(vectorTest.ToString()));
-
+	Sphere->OnComponentBeginOverlap.AddDynamic(this,&AItem::OnSphereBeginOverlap);
+	Sphere->OnComponentEndOverlap.AddDynamic(this, &AItem::OnSphereEndOverlap);
 }
 
 void AItem::Tick(float DeltaTime)
@@ -48,4 +47,19 @@ float AItem::TransformedSine(float InputValue) {
 
 float AItem::TransformedCosine(float InputValue) {
 	return Amplitude * FMath::Cos(InputValue * TimeConstant);
+}
+
+void AItem::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	const FString OtherActorName = OtherActor->GetName();
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Emerald, OtherComp->GetName());
+	}
+}
+
+void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(2, 5.f, FColor::Emerald, OtherComp->GetName() + FString("Ended overlap"));
+	}
 }
