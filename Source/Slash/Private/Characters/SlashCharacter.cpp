@@ -6,6 +6,9 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GroomComponent.h"
+#include "Items/Item.h"
+#include "Items/Weapons/Weapon.h"
+
 
 #include "InputAction.h"
 #include "InputActionValue.h"
@@ -87,7 +90,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
+		EnhancedInputComponent->BindAction(EKeyAction, ETriggerEvent::Triggered, this, &ASlashCharacter::EKeyPressedCB);
 	}
 
 	//Fully functional non enhanced input
@@ -101,6 +104,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	//without calling StopJumping, the jump will behave as if you're holding the whole time
 	//PlayerInputComponent->BindAction(FName("Jump"), EInputEvent::IE_Pressed, this, &ACharacter::Jump);
 	//PlayerInputComponent->BindAction(FName("Jump"), EInputEvent::IE_Released, this, &ACharacter::StopJumping);
+	//PlayerInputComponent->BindAction(FName("Equip"), EInputEvent::IE_Pressed, this, &ASlashCharacter::EKeyPressed);
 }
 
 void ASlashCharacter::Move(const FInputActionValue& Value)
@@ -175,4 +179,12 @@ void ASlashCharacter::TurnCB(float Value)
 void ASlashCharacter::LookUpCB(float Value)
 {
 	AddControllerPitchInput(Value);
+}
+
+void ASlashCharacter::EKeyPressedCB()
+{
+	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
+	if (OverlappingWeapon) {
+		OverlappingWeapon->Equip(GetMesh(), FName(TEXT("RightHandSocket")));
+	}
 }

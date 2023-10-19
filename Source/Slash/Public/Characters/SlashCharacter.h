@@ -8,6 +8,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UGroomComponent;
+class AItem;
 
 class UInputMappingContext;
 class UInputAction;
@@ -38,14 +39,23 @@ protected:
 	UInputAction* LookAction;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* JumpAction;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* EKeyAction;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	//Not needed because the old callback can just be reused in enhanced input because it's just a boolean so we don't need a unique callback with an FInputActionValue
+	//void EKeyPressed(const FInputActionValue& Value);
 
+	//CB stands for Callback, putting this prefix on all the old input callbacks, and a few of the enhanced inputs which are just boolean so we don't need to
+	//pass in InputActionValue to them.
 	void MoveForwardCB(float Value);
 	void MoveRightCB(float Value);
 	void TurnCB(float Value);
 	void LookUpCB(float Value);
+	//To use E key for multiple things, not just equipping
+	void EKeyPressedCB();
+
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -58,4 +68,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Hair)
 	UGroomComponent* Eyebrows;
+
+	UPROPERTY(VisibleInstanceOnly)
+	AItem* OverlappingItem;
+
+public:
+	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item;}
 };

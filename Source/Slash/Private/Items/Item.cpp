@@ -5,6 +5,9 @@
 #include "Slash/DebugMacros.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/SphereComponent.h"
+#include "Characters/SlashCharacter.h"
+
+
 
 #define THIRTY 30
 
@@ -52,14 +55,16 @@ float AItem::TransformedCosine(float InputValue) {
 void AItem::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	const FString OtherActorName = OtherActor->GetName();
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Emerald, OtherComp->GetName());
+	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
+	if (SlashCharacter) {
+		SlashCharacter->SetOverlappingItem(this);
 	}
 }
 
 void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(2, 5.f, FColor::Emerald, OtherComp->GetName() + FString("Ended overlap"));
+	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
+	if (SlashCharacter) {
+		SlashCharacter->SetOverlappingItem(nullptr);
 	}
 }

@@ -4,15 +4,16 @@
 #include "Items/Weapons/Weapon.h"
 #include "Characters/SlashCharacter.h"
 
-void AWeapon::Equip(USceneComponent* InParent, FName InSocketName)
-{
-	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
-	ItemMesh->AttachToComponent(InParent, TransformRules, FName("RightHandSocket"));
-}
-
 void AWeapon::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	Super::OnSphereBeginOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
+	if (SlashCharacter) {
+		//Used a constructor that only needs two parameters, using snap to target for entire transform, no need to use the constructor that specifies separately for location rotation and scale
+		//The second parameter weld physics body boolean is not really used for our situation, so making it true or false is acceptable here.
+		FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
+		ItemMesh->AttachToComponent(SlashCharacter->GetMesh(), TransformRules, FName("RightHandSocket"));
+	}
 
 }
 

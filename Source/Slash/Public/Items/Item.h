@@ -26,6 +26,9 @@ protected:
 	float Amplitude;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameters")
 	float TimeConstant;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UStaticMeshComponent* ItemMesh;
+
 	UFUNCTION(BlueprintPure)
 	float TransformedSine(float InputValue);
 	UFUNCTION(BlueprintPure)
@@ -38,10 +41,8 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, meta = (AllowPrivateAccess = "true"))  //This line is the one that Stephen used, but I didn't think it was necessary
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))  //This line is the one that Stephen used, but I didn't think it was necessary
 	float RunningTime;
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* ItemMesh;
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* Sphere;
 };
