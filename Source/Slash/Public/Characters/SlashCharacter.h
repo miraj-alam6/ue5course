@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Characters/CharacterTypes.h"
 #include "SlashCharacter.generated.h"
 class USpringArmComponent;
 class UCameraComponent;
@@ -16,6 +17,7 @@ class UInputAction;
 
 //only can do this forward declaration because the header has a reference to a struct rather than passing it by value
 struct FInputActionValue;
+
 
 UCLASS()
 class SLASH_API ASlashCharacter : public ACharacter
@@ -58,6 +60,8 @@ protected:
 
 
 private:
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere)
@@ -74,4 +78,5 @@ private:
 
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item;}
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 };

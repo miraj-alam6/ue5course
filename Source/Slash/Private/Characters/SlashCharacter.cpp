@@ -186,5 +186,6 @@ void ASlashCharacter::EKeyPressedCB()
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if (OverlappingWeapon) {
 		OverlappingWeapon->Equip(GetMesh(), FName(TEXT("RightHandSocket")));
+		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
 	}
 }
