@@ -16,6 +16,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Components/InputComponent.h"
+#include "Animation/AnimMontage.h"
+#include "Animation/AnimInstance.h"
 
 
 
@@ -105,6 +107,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	//PlayerInputComponent->BindAction(FName("Jump"), EInputEvent::IE_Pressed, this, &ACharacter::Jump);
 	//PlayerInputComponent->BindAction(FName("Jump"), EInputEvent::IE_Released, this, &ACharacter::StopJumping);
 	//PlayerInputComponent->BindAction(FName("Equip"), EInputEvent::IE_Pressed, this, &ASlashCharacter::EKeyPressed);
+	PlayerInputComponent->BindAction(FName("Attack"), EInputEvent::IE_Pressed, this, &ASlashCharacter::AttackCB);
 }
 
 void ASlashCharacter::Move(const FInputActionValue& Value)
@@ -187,5 +190,29 @@ void ASlashCharacter::EKeyPressedCB()
 	if (OverlappingWeapon) {
 		OverlappingWeapon->Equip(GetMesh(), FName(TEXT("RightHandSocket")));
 		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+	}
+}
+
+void ASlashCharacter::AttackCB()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && AttackMontage) {
+		AnimInstance->Montage_Play(AttackMontage);
+		int32 Selection = FMath::RandRange(0, 2);
+		FName SectionName = FName();
+		switch (Selection) {
+		case 0:
+			SectionName = FName("Attack1");
+			break;
+		case 1:
+			SectionName = FName("Attack2");
+			break;
+		case 2:
+			SectionName = FName("Attack3");
+			break;
+		default:
+			SectionName = FName("Attack1");
+		}
+		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
 	}
 }

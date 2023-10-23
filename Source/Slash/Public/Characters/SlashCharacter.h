@@ -9,8 +9,9 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UGroomComponent;
-class AItem;
+class UAnimMontage;
 
+class AItem;
 class UInputMappingContext;
 class UInputAction;
 
@@ -57,7 +58,7 @@ protected:
 	void LookUpCB(float Value);
 	//To use E key for multiple things, not just equipping
 	void EKeyPressedCB();
-
+	void AttackCB();
 
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
@@ -75,6 +76,12 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
+
+	/**
+	* Animation montages
+	*/
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* AttackMontage;
 
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item;}
