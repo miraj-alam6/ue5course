@@ -1,0 +1,3 @@
+Reminder:
+I made a custom animation sequence using keys in Unreal engine called Custom_Low_Sweep_WithKeys. I first duplicated the regular attack, and then added the keys to the duplicate.
+I also baked it into  Custom_Low_Sweep_Baked

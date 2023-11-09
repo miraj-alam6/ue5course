@@ -271,7 +271,10 @@ void ASlashCharacter::PlayAttackMontage()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && AttackMontage) {
 		AnimInstance->Montage_Play(AttackMontage);
-		const int32 Selection = FMath::RandRange(0, 2);
+		//Uncomment out to get random attack
+		const int32 Selection = FMath::RandRange(0, 3);
+		//Uncomment out to get a single attack always
+		//const int32 Selection = 1;
 		FName SectionName = FName();
 		switch (Selection) {
 		case 0:
@@ -282,6 +285,9 @@ void ASlashCharacter::PlayAttackMontage()
 			break;
 		case 2:
 			SectionName = FName("Attack3");
+			break;
+		case 3:
+			SectionName = FName("Attack4");
 			break;
 		default:
 			SectionName = FName("Attack1");

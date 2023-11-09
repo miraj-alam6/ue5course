@@ -35,7 +35,8 @@ protected:
 	UStaticMeshComponent* ItemMesh;
 
 	EItemState ItemState = EItemState::EIS_Hovering;
-
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* Sphere;
 
 	UFUNCTION(BlueprintPure)
 	float TransformedSine(float InputValue);
@@ -51,8 +52,6 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))  //This line is the one that Stephen used, but I didn't think it was necessary
 	float RunningTime;
-	UPROPERTY(VisibleAnywhere)
-	USphereComponent* Sphere;
 };
 
 template<typename T>
