@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/BoxComponent.h"
 #include "GroomComponent.h"
 #include "Items/Item.h"
 #include "Items/Weapons/Weapon.h"
@@ -109,6 +110,14 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	//PlayerInputComponent->BindAction(FName("Equip"), EInputEvent::IE_Pressed, this, &ASlashCharacter::EKeyPressed);
 	PlayerInputComponent->BindAction(FName("Attack"), EInputEvent::IE_Pressed, this, &ASlashCharacter::AttackCB);
 }
+
+void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
+{
+	if (EquippedWeapon && EquippedWeapon->GetWeaponBox()) {
+		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+	}
+}
+
 
 void ASlashCharacter::Move(const FInputActionValue& Value)
 {
