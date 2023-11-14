@@ -66,19 +66,22 @@ void AWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	const FVector Start = BoxTraceStart->GetComponentLocation();
 	const FVector End = BoxTraceEnd->GetComponentLocation();
 
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
+	//Storing as a member variable now so that sword swings hit things only once per swing
+	//TArray<AActor*> ActorsToIgnore;
+	//ActorsToIgnore.Add(this);
 
 	FHitResult BoxHit;
 
 	UKismetSystemLibrary::BoxTraceSingle(this, Start, End, 
 		FVector(5.f, 5.f, 5.f), BoxTraceStart->GetComponentRotation(), ETraceTypeQuery::TraceTypeQuery1,
-		false, ActorsToIgnore, EDrawDebugTrace::ForDuration, BoxHit, true);
+		false, IgnoreActors, EDrawDebugTrace::ForDuration, BoxHit, true);
 
 	if (BoxHit.GetActor()) {
 		IHitInterface* HitInterface = Cast<IHitInterface>(BoxHit.GetActor());
 		if (HitInterface) {
 			HitInterface->GetHit(BoxHit.ImpactPoint);
+			//Prevents hitting the same actor again in the same swing.
+			IgnoreActors.AddUnique(BoxHit.GetActor());
 		}
 	}
 }

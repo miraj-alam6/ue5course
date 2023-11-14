@@ -5,10 +5,17 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Slash/DebugMacros.h"
+#include "Animation/AnimMontage.h"
+#include "Animation/AnimInstance.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AEnemy::AEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = false;
+
 
 	GetMesh()->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
@@ -26,6 +33,16 @@ void AEnemy::BeginPlay()
 	
 }
 
+void AEnemy::PlayHitReactMontage(const FName& SectionName)
+{
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && HitReactMontage) {
+		AnimInstance->Montage_Play(HitReactMontage);
+		AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
+	}
+}
+
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -40,6 +57,55 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AEnemy::GetHit(const FVector& ImpactPoint)
 {
+	DirectionalHitReact(ImpactPoint);
+
+}
+
+void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
+{
 	DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
+
+	const FVector Forward = GetActorForwardVector();
+	//Making the Z be the same as actor so that dot product doesn't include Z component
+	const FVector ImpactLowered(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z);
+	const FVector ToHit = (ImpactLowered - GetActorLocation()).GetSafeNormal();
+
+	// Forward * ToHit = |Forward| |ToHit| * cos (theta) and because we normalize it is
+	// Forward * ToHit =  cos (theta)
+	const double CosTheta = FVector::DotProduct(Forward, ToHit);
+	double Theta = FMath::Acos(CosTheta);
+	//Convert from radians to degrees
+	Theta = FMath::RadiansToDegrees(Theta);
+
+	//If cross product points down, then we're being hit from the left and theta should be made negative
+	const FVector CrossProduct = FVector::CrossProduct(Forward, ToHit);
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + CrossProduct * 100.f, 5.f, FColor::Blue, 5.f);
+	//Remember theta is always positive so we check if cross product indicates hit was from left, thus meaning we should
+	//multiply theta by -1 to reflect the leftness since right is the positive direction.
+	if (CrossProduct.Z < 0) {
+		Theta *= -1.f;
+	}
+
+	//This is implictly the 135 to -135 case if none of the other ones succeed
+	FName Section("FromBack");
+
+	if (Theta >= -45.f && Theta < 45.f) {
+		Section = FName("FromFront");
+	}
+	else if (Theta >= -135.f && Theta < -45.f) {
+		Section = FName("FromLeft");
+	}
+	else if (Theta >= 45.f && Theta < 135.f) {
+		Section = FName("FromRight");
+	}
+
+	PlayHitReactMontage(Section);
+
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.f, FColor::Red, 5.f);
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green, FString::Printf(TEXT("Theta %f"), Theta));
+	}
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.f, FColor::Red, 5.f);
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.f, FColor::Green, 5.f);
 }
 

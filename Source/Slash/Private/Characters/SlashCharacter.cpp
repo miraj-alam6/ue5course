@@ -114,6 +114,13 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
 {
 	if (EquippedWeapon && EquippedWeapon->GetWeaponBox()) {
+		if (CollisionEnabled == ECollisionEnabled::NoCollision) {
+			EquippedWeapon->IgnoreActors.Empty();
+		}
+		else {
+			//From the weapon's point of view it should ignore itself.
+			EquippedWeapon->IgnoreActors.AddUnique(EquippedWeapon);
+		}
 		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
 	}
 }
@@ -305,7 +312,7 @@ void ASlashCharacter::PlayAttackMontage()
 	}
 }
 
-void ASlashCharacter::PlayEquipMontage(FName SectionName)
+void ASlashCharacter::PlayEquipMontage(const FName& SectionName)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && EquipMontage) {
