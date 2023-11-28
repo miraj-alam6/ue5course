@@ -72,9 +72,10 @@ void AWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 
 	FHitResult BoxHit;
 
+	//to VISUALIZE THE BOX TRACE MAKE EDrawDebugTrace non None
 	UKismetSystemLibrary::BoxTraceSingle(this, Start, End, 
 		FVector(5.f, 5.f, 5.f), BoxTraceStart->GetComponentRotation(), ETraceTypeQuery::TraceTypeQuery1,
-		false, IgnoreActors, EDrawDebugTrace::ForDuration, BoxHit, true);
+		false, IgnoreActors, EDrawDebugTrace::None, BoxHit, true);
 
 	if (BoxHit.GetActor()) {
 		IHitInterface* HitInterface = Cast<IHitInterface>(BoxHit.GetActor());

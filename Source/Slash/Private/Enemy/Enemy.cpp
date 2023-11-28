@@ -9,6 +9,8 @@
 #include "Animation/AnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
+
 
 AEnemy::AEnemy()
 {
@@ -59,11 +61,21 @@ void AEnemy::GetHit(const FVector& ImpactPoint)
 {
 	DirectionalHitReact(ImpactPoint);
 
+	if (HitSound) {
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
+	}
+	//He said the GetWorld() is not null check is not necessary so I excluded it.
+	if (HitParticles /*&& GetWorld()*/) {
+		UGameplayStatics::SpawnEmitterAtLocation(
+			GetWorld(),
+			HitParticles,
+			ImpactPoint
+		);
+	}
 }
 
 void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 {
-	DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
 
 	const FVector Forward = GetActorForwardVector();
 	//Making the Z be the same as actor so that dot product doesn't include Z component
@@ -79,7 +91,6 @@ void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 
 	//If cross product points down, then we're being hit from the left and theta should be made negative
 	const FVector CrossProduct = FVector::CrossProduct(Forward, ToHit);
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + CrossProduct * 100.f, 5.f, FColor::Blue, 5.f);
 	//Remember theta is always positive so we check if cross product indicates hit was from left, thus meaning we should
 	//multiply theta by -1 to reflect the leftness since right is the positive direction.
 	if (CrossProduct.Z < 0) {
@@ -100,12 +111,16 @@ void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 	}
 
 	PlayHitReactMontage(Section);
-
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.f, FColor::Red, 5.f);
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green, FString::Printf(TEXT("Theta %f"), Theta));
-	}
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.f, FColor::Red, 5.f);
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.f, FColor::Green, 5.f);
+	
+	////DEBUG WHEN HITTING
+	//DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
+	//UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.f, FColor::Red, 5.f);
+	//if (GEngine) {
+	//	GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green, FString::Printf(TEXT("Theta %f"), Theta));
+	//}
+	//UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + CrossProduct * 100.f, 5.f, FColor::Blue, 5.f);
+	//UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.f, FColor::Red, 5.f);
+	//UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.f, FColor::Green, 5.f);
+	
 }
 
