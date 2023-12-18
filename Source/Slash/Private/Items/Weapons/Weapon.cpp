@@ -81,8 +81,11 @@ void AWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 		IHitInterface* HitInterface = Cast<IHitInterface>(BoxHit.GetActor());
 		if (HitInterface) {
 			HitInterface->GetHit(BoxHit.ImpactPoint);
-			//Prevents hitting the same actor again in the same swing.
-			IgnoreActors.AddUnique(BoxHit.GetActor());
 		}
+		//Prevents hitting the same actor again in the same swing.
+		IgnoreActors.AddUnique(BoxHit.GetActor());
+
+		CreateFields(BoxHit.ImpactPoint, BoxHit.GetActor());
 	}
 }
+
