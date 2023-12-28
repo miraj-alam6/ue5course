@@ -9,6 +9,7 @@
 #include "GroomComponent.h"
 #include "Items/Item.h"
 #include "Items/Weapons/Weapon.h"
+#include "Camera/PlayerCameraManager.h"
 
 
 #include "InputAction.h"
@@ -139,8 +140,11 @@ void ASlashCharacter::Move(const FInputActionValue& Value)
 	//This works with rotatable camera (controller's rotation)
 	//Only move if unoccupied, no moving and attacking in this game.
 	//Dude in video did it a bit differently, simply returning if we are already attacking
+
+
 	if (ActionState == EActionState::EAS_Unoccupied) {
 		const FRotator Rotation = Controller->GetControlRotation();
+
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);

@@ -8,6 +8,8 @@
 #include "BreakableActor.generated.h"
 
 class UGeometryCollectionComponent;
+class ATreasure;
+class UCapsuleComponent;
 
 UCLASS()
 class SLASH_API ABreakableActor : public AActor, public IHitInterface
@@ -22,10 +24,16 @@ public:
 	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
 protected:
 	virtual void BeginPlay() override;
-private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UGeometryCollectionComponent* GeometryCollection;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UCapsuleComponent* Capsule;
+private:
+	UPROPERTY(EditAnywhere, Category = "Breakable Properties")
+	//Using a UClass is possible but it's a bit too general, too many choices that leave a lot of room for error
+	//when setting in editor. It's better to use a TSubclassOf
+	//UClass* TreasureClass;
+	TSubclassOf<ATreasure> TreasureClass;
 
 public:
 	UFUNCTION(BlueprintPure)
