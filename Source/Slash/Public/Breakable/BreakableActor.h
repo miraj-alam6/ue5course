@@ -28,12 +28,18 @@ protected:
 	UGeometryCollectionComponent* GeometryCollection;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UCapsuleComponent* Capsule;
+	UFUNCTION(BlueprintNativeEvent)
+	FTransform GetPhysicsBodyWorkaround(UPrimitiveComponent* Component);
 private:
 	UPROPERTY(EditAnywhere, Category = "Breakable Properties")
+	TArray<TSubclassOf<ATreasure>> Treasures;
+	bool bBroken = false;
 	//Using a UClass is possible but it's a bit too general, too many choices that leave a lot of room for error
 	//when setting in editor. It's better to use a TSubclassOf
 	//UClass* TreasureClass;
-	TSubclassOf<ATreasure> TreasureClass;
+	// Old code when there was only one type of treasure
+	//UPROPERTY(EditAnywhere, Category = "Breakable Properties")
+	//TSubclassOf<ATreasure> TreasureClass;
 
 public:
 	UFUNCTION(BlueprintPure)

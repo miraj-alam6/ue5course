@@ -7,6 +7,7 @@
 #include "Item.generated.h"
 
 class USphereComponent;
+class UNiagaraComponent;
 
 enum class EItemState : uint8 {
 	EIS_Hovering,
@@ -37,6 +38,8 @@ protected:
 	EItemState ItemState = EItemState::EIS_Hovering;
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* Sphere;
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* EmbersEffect;
 
 	UFUNCTION(BlueprintPure)
 	float TransformedSine(float InputValue);

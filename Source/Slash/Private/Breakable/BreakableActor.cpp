@@ -35,6 +35,12 @@ void ABreakableActor::BeginPlay()
 	
 }
 
+FTransform ABreakableActor::GetPhysicsBodyWorkaround_Implementation(UPrimitiveComponent* Component)
+{
+	//Will override in blueprints to return UPhysicsObjectBlueprintLibrary::GetClosestPhysicsObjectFromWorldLocation, can't do from C++ because linker error that I don't know how to fix.
+	return Component->GetComponentTransform();
+}
+
 
 //Reminder: will never reach here
 void ABreakableActor::Tick(float DeltaTime)
@@ -43,16 +49,24 @@ void ABreakableActor::Tick(float DeltaTime)
 
 }
 
+
+//IMPORTANT GOOD OPTIONAL EXERCISE: Binding to OnChaosBreakEvent of geometry collection will let you spawn treasure no matter how the pot breaks, rather than just when it is hit
 void ABreakableActor::GetHit_Implementation(const FVector& ImpactPoint)
 {
+	if (bBroken) {
+		return;
+	}
+	bBroken = true;
 	UWorld* World = GetWorld();
-	if (World && TreasureClass) {
+	if (World && Treasures.Num() > 0) {
 		//Actor location does not actually represent where the breakableactor's physics objects are
 		//but this is how the dude in the tutorial did it.
-		//FVector Location = GetActorLocation();
-		FVector Location = UPhysicsObjectBlueprintLibrary::GetPhysicsObjectWorldTransform(GeometryCollection, FName("None")).GetLocation();
-		//Location.Z += 75.f;
-		//World->SpawnActor<ATreasure>(TreasureClass, Location, GetActorRotation());
+		FVector Location = GetPhysicsBodyWorkaround(GeometryCollection).GetLocation();
+		
+		//FVector Location = UPhysicsObjectBlueprintLibrary::GetPhysicsObjectWorldTransform(GeometryCollection, FName("None")).GetLocation();
+		int32 Selection = FMath::RandRange(0, Treasures.Num() - 1);
+		Location.Z += 75.f;
+		World->SpawnActor<ATreasure>(Treasures[Selection], Location, GetActorRotation());
 
 		//UPhysicsObjectBlueprintLibrary::GetClosestPhysicsObjectFromWorldLocation(GeometryCollection, GetActorLocation());
 	}

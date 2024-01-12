@@ -8,9 +8,9 @@ public class Slash : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Niagara", "HairStrandsCore", "MetasoundEngine", "GeometryCollectionEngine", "Chaos"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Niagara", "HairStrandsCore", "MetasoundEngine", "GeometryCollectionEngine", "Chaos", "PhysicsCore", "Engine" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "Chaos" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "Chaos", "PhysicsCore", "Engine" });
 
         //Reminder of dependencies I tried: "ChaosCore", "PhysicsCore",  "Chaos"
 
