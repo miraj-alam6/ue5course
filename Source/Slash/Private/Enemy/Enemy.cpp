@@ -10,7 +10,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Components/AttributeComponent.h"
+#include "HUD/HealthBarComponent.h"
 
 AEnemy::AEnemy()
 {
@@ -26,13 +27,20 @@ AEnemy::AEnemy()
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 
-
+	//Note how UAttributeComponent does not need to be attached to anything because it's just data.
+	//However the transform for HealthBarWidget does matter, so we do attach it.
+	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
+	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
+	HealthBarWidget->SetupAttachment(GetRootComponent());
 }
 
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (HealthBarWidget) {
+		HealthBarWidget->SetHealthPercent(1.f);
+	}
 }
 
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
@@ -122,5 +130,25 @@ void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 	//UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.f, FColor::Red, 5.f);
 	//UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.f, FColor::Green, 5.f);
 	
+}
+
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	//The dude's code is a little different, I did it differently on his purpose
+	//This is his code:
+	//if (Attributes && HealthBarWidget) {
+	//	Attributes->ReceiveDamage(DamageAmount);
+	//	HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
+	//}
+
+	if (Attributes) {
+		Attributes->ReceiveDamage(DamageAmount);
+	}
+
+	if (HealthBarWidget) {		
+		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
+	}
+
+	return DamageAmount;
 }
 
