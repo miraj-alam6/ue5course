@@ -13,6 +13,7 @@
 #include "Components/AttributeComponent.h"
 #include "HUD/HealthBarComponent.h"
 
+
 AEnemy::AEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -32,14 +33,77 @@ AEnemy::AEnemy()
 	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
 	HealthBarWidget->SetupAttachment(GetRootComponent());
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
 }
 
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	if (HealthBarWidget) {
+		HealthBarWidget->SetVisibility(false);
+	}
 
 	if (HealthBarWidget) {
 		HealthBarWidget->SetHealthPercent(1.f);
+	}
+}
+
+void AEnemy::Die()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && DeathMontage) {
+		AnimInstance->Montage_Play(DeathMontage);
+
+
+		//How the dude did the section Name. 
+		// I commented it out and  feel like I made an improved more elegant solution.
+		// const int32 Selection = FMath::RandRange(0, 5);
+		//FName SectionName = FName();
+		//switch (Selection) {
+		//case 0:
+		//	SectionName = FName("Death1");
+		//  DeathPose = EDeathPose::EDP_Death1
+		//	break;
+		//case 1:
+		//	SectionName = FName("Death2");
+		//  DeathPose = EDeathPose::EDP_Death2
+		//	break;
+		//case 2:
+		//	SectionName = FName("Death3");
+		//	DeathPose = EDeathPose::EDP_Death3
+		//	break;
+		//case 3:
+		//	SectionName = FName("Death4");
+		//	DeathPose = EDeathPose::EDP_Death4
+		//	break;
+		//case 4:
+		//	SectionName = FName("Death5");
+		//	DeathPose = EDeathPose::EDP_Death5
+		//	break;
+		//case 5:
+		//	SectionName = FName("Death6");
+		//	DeathPose = EDeathPose::EDP_Death6
+		//	break;
+		//default:
+		//	SectionName = FName("Death1");
+		//}
+
+		//How I did it
+		const int32 Selection = FMath::RandRange(0, 5) + 1;
+		//I made sure that EDeathPose values correspond to explicit integer values
+		DeathPose = (EDeathPose)(Selection);
+		FName SectionName =  FName(FString::Printf(TEXT("Death%i"), Selection));
+		AnimInstance->Montage_JumpToSection(SectionName, DeathMontage);
+	}
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetLifeSpan(5.f);
+	if (HealthBarWidget) {
+		HealthBarWidget->SetVisibility(false);
 	}
 }
 
@@ -57,6 +121,16 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (CombatTarget) {
+		const double DistanceToTarget = (CombatTarget->GetActorLocation() - GetActorLocation()).Size();
+		//Note: this can be easily optimized slightly by doing square length
+		if (DistanceToTarget > CombatRadius) {
+			CombatTarget = nullptr;
+			if (HealthBarWidget) {
+				HealthBarWidget->SetVisibility(false);
+			}
+		}
+	}
 }
 
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -67,7 +141,18 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	DirectionalHitReact(ImpactPoint);
+	if (HealthBarWidget) {
+		HealthBarWidget->SetVisibility(true);
+	}
+
+	if (Attributes && Attributes->IsAlive()) {
+		DirectionalHitReact(ImpactPoint);
+	}
+	else {
+		Die();
+	}
+
+
 
 	if (HitSound) {
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
@@ -149,6 +234,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
 	}
 
+	CombatTarget = EventInstigator->GetPawn();
 	return DamageAmount;
 }
 
