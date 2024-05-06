@@ -13,6 +13,7 @@ class UAnimMontage;
 class AAIController;
 class UAttributeComponent;
 class UHealthBarComponent;
+class UPawnSensingComponent;
 
 UCLASS()
 class SLASH_API AEnemy : public ACharacter, public IHitInterface
@@ -22,6 +23,10 @@ class SLASH_API AEnemy : public ACharacter, public IHitInterface
 public:
 	AEnemy();
 	virtual void Tick(float DeltaTime) override;
+
+	void CheckPatrolTarget();
+
+	void CheckCombatTarget();
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	//From IHitInterface old way
@@ -43,11 +48,27 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	EDeathPose DeathPose = EDeathPose::EDP_Alive;
 
+	//Can be used for both combat and patrol targets.
+	bool InTargetRange(AActor* Target, double Radius);
+	void MoveToTarget(AActor* Target);
+	AActor* ChoosePatrolTarget();
+
+	UFUNCTION()
+	void OnPawnSeen(APawn* SeenPawn);
+
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 private:
+
+	/*
+	* Components
+	*/
+
 	UPROPERTY(VisibleAnywhere)
 	UAttributeComponent* Attributes;
 	UPROPERTY(VisibleAnywhere)
 	UHealthBarComponent* HealthBarWidget;
+	UPROPERTY(VisibleAnywhere)
+	UPawnSensingComponent* PawnSensing;
 /**
 * Animation montages
 */
@@ -67,6 +88,22 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	double CombatRadius = 500.f;
+
+	//Will be overriden before doing MoveTo
+	UPROPERTY(EditAnywhere)
+	double PatrolDoneRadius = -1.f;
+
+
+	FTimerHandle PatrolTimer;
+	void PatrolTimerFinished();
+
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float WaitMin = 2.f;
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float WaitMax = 8.f;
+
+	const float AcceptanceRadius = 15.f;
 
 	/**
 	*Navigation 

@@ -2,6 +2,8 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 
+//To include use
+//#include "Slash/DebugMacros.h"
 //SHAPES
 #define DRAW_SPHERE(Location) if (GetWorld()) DrawDebugSphere(GetWorld(), Location, 25.f, 12, FColor::Red, true);
 //This just says color in the name but it also makes the sphere smaller than above and lasts only 5 seconds
