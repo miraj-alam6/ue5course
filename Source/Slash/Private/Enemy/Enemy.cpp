@@ -202,12 +202,18 @@ void AEnemy::OnPawnSeen(APawn* SeenPawn)
 		return;
 	}
 	if (SeenPawn->ActorHasTag(FName("SlashCharacter"))) {		
-		EnemyState = EEnemyState::EES_Chasing;
 		GetWorldTimerManager().ClearTimer(PatrolTimer);
 		//Hard coded for now, we'll fix this later.
 		GetCharacterMovement()->MaxWalkSpeed = 300.f;
 		CombatTarget = SeenPawn;
-		MoveToTarget(CombatTarget);
+
+		//Do not chase the player again if you're already attacking, otherwise the states
+		//will keep leading back into each other on every pawn sensing update
+		if (EnemyState != EEnemyState::EES_Attacking) {
+			EnemyState = EEnemyState::EES_Chasing;
+			MoveToTarget(CombatTarget);
+			UE_LOG(LogTemp, Warning, TEXT("Pawn seen, Chase Player"));
+		}
 	}
 }
 
@@ -259,6 +265,21 @@ void AEnemy::CheckCombatTarget()
 		EnemyState = EEnemyState::EES_Patrolling;
 		GetCharacterMovement()->MaxWalkSpeed = 125.f;
 		MoveToTarget(PatrolTarget);
+		UE_LOG(LogTemp, Warning, TEXT("Lose Interest"));
+	}
+	else if (!InTargetRange(CombatTarget, AttackRadius) && EnemyState != EEnemyState::EES_Chasing) {
+		//We are outside attack radius if here, so that means we should chase the character
+		EnemyState = EEnemyState::EES_Chasing;
+		GetCharacterMovement()->MaxWalkSpeed = 300.f;
+		MoveToTarget(CombatTarget);
+		UE_LOG(LogTemp, Warning, TEXT("Chase Player"));
+	}
+	//There's no need to have to do InTargetRadius AttackRadius this many times,
+	//Can probably move some boolean logic around to retain all the logic, but
+	else if (InTargetRange(CombatTarget,AttackRadius) && EnemyState != EEnemyState::EES_Attacking){
+		//Inside attack radius, attack character
+		EnemyState = EEnemyState::EES_Attacking;
+		UE_LOG(LogTemp, Warning, TEXT("Attack"));
 	}
 }
 
